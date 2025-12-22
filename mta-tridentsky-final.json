@@ -12,8 +12,11 @@
     "docker_images": {
         "ghcr.io\/tridentsky\/mta-fastdl:latest": "ghcr.io\/tridentsky\/mta-fastdl:latest"
     },
-    "file_denylist": [],
-    "startup": "bash start.sh",
+    "file_denylist": [
+        "\/opt\/start.sh",
+        "\/entrypoint.sh"
+    ],
+    "startup": ".\/mta-server64",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"Server started and is ready to accept connections\"\r\n}",
