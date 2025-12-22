@@ -62,7 +62,6 @@ EOF
         sleep 2
         if pgrep -x nginx > /dev/null; then
             echo "[FastDL] ✓ Active on port ${FASTDL_PORT}"
-            echo "[FastDL] Test URL: http://YOUR_IP:${FASTDL_PORT}/admin/conf/interiors.xml"
         else
             echo "[FastDL] ✗ Failed to start - Check /tmp/nginx_error.log"
             cat /tmp/nginx_error.log 2>/dev/null || echo "No error log found"
