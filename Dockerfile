@@ -16,6 +16,10 @@ RUN apt-get update && \
     wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
     dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb || apt-get install -f -y && \
     rm -f libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
+    wget http://security.ubuntu.com/ubuntu/pool/main/m/mysql-5.7/libmysqlclient20_5.7.44-0ubuntu0.18.04.1_amd64.deb && \
+    dpkg -i libmysqlclient20_5.7.44-0ubuntu0.18.04.1_amd64.deb || apt-get install -f -y && \
+    rm -f libmysqlclient20_5.7.44-0ubuntu0.18.04.1_amd64.deb && \
+    ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so.20 /usr/lib/x86_64-linux-gnu/libmysqlclient.so.16 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
