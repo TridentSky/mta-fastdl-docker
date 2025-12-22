@@ -37,7 +37,7 @@ if [ "${FASTDL_ENABLED}" = "1" ]; then
 
     cat > /tmp/nginx.conf << 'EOF'
 worker_processes auto;
-error_log /tmp/nginx_error.log warn;
+error_log /tmp/nginx_error.log error;
 pid /tmp/nginx.pid;
 events {
     worker_connections 1024;
@@ -50,6 +50,7 @@ http {
     fastcgi_temp_path /tmp/nginx_cache/fastcgi;
     uwsgi_temp_path /tmp/nginx_cache/uwsgi;
     scgi_temp_path /tmp/nginx_cache/scgi;
+    access_log off;
     sendfile on;
     tcp_nopush on;
     keepalive_timeout 30;
@@ -62,8 +63,8 @@ EOF
 
     cat >> /tmp/nginx.conf << 'EOF'
         root /home/container/mods/deathmatch/resource-cache/http-client-files;
-        access_log /tmp/nginx_access.log;
-        error_log /tmp/nginx_server_error.log;
+        access_log off;
+        error_log /tmp/nginx_server_error.log error;
         location / {
             autoindex off;
         }
@@ -71,17 +72,14 @@ EOF
 }
 EOF
 
-    echo "[FastDL] Testing Nginx config..."
-    nginx -t -c /tmp/nginx.conf
+    nginx -t -c /tmp/nginx.conf 2>&1 | grep -v "alert" | grep -v "warn" > /tmp/nginx_test.log
 
-    if [ $? -eq 0 ]; then
-        nginx -c /tmp/nginx.conf
-        sleep 2
+    if nginx -c /tmp/nginx.conf 2>/dev/null; then
+        sleep 1
         if pgrep -x nginx > /dev/null; then
             echo "[FastDL] ✓ Active on port ${FASTDL_PORT}"
         else
-            echo "[FastDL] ✗ Failed to start - Check /tmp/nginx_error.log"
-            cat /tmp/nginx_error.log 2>/dev/null || echo "No error log found"
+            echo "[FastDL] ✗ Failed to start"
         fi
     else
         echo "[FastDL] ✗ Config test failed"
