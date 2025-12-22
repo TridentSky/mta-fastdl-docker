@@ -10,7 +10,7 @@ if [ ! -f "x64/modules/mta_mysql.so" ] || [ ! -s "x64/modules/mta_mysql.so" ]; t
     echo "[MySQL] Installing MySQL module..."
     mkdir -p x64/modules
     rm -f x64/modules/mta_mysql.so
-    wget --timeout=10 --tries=3 -O x64/modules/mta_mysql.so https://github.com/mabako/mta-mysql/releases/download/v0.3.1/mta_mysql-linux-x64.so 2>&1 | grep -v "Resolving\|Connecting\|HTTP"
+    wget --timeout=10 --tries=3 -O x64/modules/mta_mysql.so https://nightly.mtasa.com/files/modules/64/mta_mysql.so 2>&1 | grep -v "Resolving\|Connecting\|HTTP"
     if [ -s "x64/modules/mta_mysql.so" ]; then
         chmod 755 x64/modules/mta_mysql.so
         echo "[MySQL] ✓ Module installed successfully"
