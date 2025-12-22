@@ -19,7 +19,7 @@ RUN apt-get update && \
     wget http://ftp.us.debian.org/debian/pool/main/m/mysql-5.5/libmysqlclient18_5.5.62-0+deb8u1_amd64.deb && \
     dpkg -i libmysqlclient18_5.5.62-0+deb8u1_amd64.deb || apt-get install -f -y && \
     rm -f libmysqlclient18_5.5.62-0+deb8u1_amd64.deb && \
-    ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so.18 /usr/lib/x86_64-linux-gnu/libmysqlclient.so.16 && \
+    ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so.18 /usr/lib/libmysqlclient.so.16 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
