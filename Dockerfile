@@ -10,7 +10,8 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
     nginx \
     libncurses5 \
-    libncursesw5 && \
+    libncursesw5 \
+    libssl1.1 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
