@@ -1,8 +1,8 @@
 #!/bin/bash
 cd /home/container
 
-if [ -f start.sh ]; then
-    exec bash start.sh
+if [ -f /opt/start.sh ]; then
+    exec bash /opt/start.sh
 else
     exec /bin/bash
 fi

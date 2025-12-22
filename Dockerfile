@@ -15,7 +15,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --chown=container:container entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY --chown=container:container start.sh /opt/start.sh
+RUN chmod +x /entrypoint.sh && chmod +x /opt/start.sh
 
 USER container
 ENV USER=container HOME=/home/container
