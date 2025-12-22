@@ -13,12 +13,12 @@ RUN apt-get update && \
     libncursesw5 \
     wget \
     ca-certificates \
-    libmysqlclient20 && \
+    libmariadb3 && \
     wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
     dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb || apt-get install -f -y && \
     rm -f libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
-    ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so.20 /usr/lib/libmysqlclient.so.16 && \
-    ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so.20 /usr/lib/x86_64-linux-gnu/libmysqlclient.so.16 && \
+    find /usr/lib -name "libmysqlclient*.so*" -o -name "libmariadb*.so*" | head -1 | xargs -I {} ln -sf {} /usr/lib/libmysqlclient.so.16 && \
+    find /usr/lib -name "libmysqlclient*.so*" -o -name "libmariadb*.so*" | head -1 | xargs -I {} ln -sf {} /usr/lib/x86_64-linux-gnu/libmysqlclient.so.16 && \
     ldconfig && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
