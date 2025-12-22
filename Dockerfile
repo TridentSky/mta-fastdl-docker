@@ -2,7 +2,7 @@ FROM ghcr.io/parkervcp/yolks:debian
 
 LABEL org.opencontainers.image.source=https://github.com/TridentSky/mta-fastdl-docker
 LABEL org.opencontainers.image.description="MTA:SA Server with FastDL and MySQL - Powered by Trident Sky"
-LABEL org.opencontainers.image.vendor="Trident Sky - www.tridentsky.net"
+LABEL org.opencontainers.image.vendor="Trident Sky - https://tridentsky.net/"
 
 USER root
 

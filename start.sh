@@ -2,7 +2,7 @@
 echo "=========================================="
 echo "MTA:SA Server - Trident Sky Edition"
 echo "MySQL Ready | FastDL Ready"
-echo "www.tridentsky.net"
+echo "https://tridentsky.net/"
 echo "=========================================="
 
 if [ "${FASTDL_ENABLED}" = "1" ]; then

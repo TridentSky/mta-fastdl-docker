@@ -92,7 +92,7 @@ docker build -t mta-fastdl:latest .
 ## Support
 
 For issues, questions, or contributions:
-- Website: [www.tridentsky.net](https://www.tridentsky.net)
+- Website: [https://tridentsky.net/](https://tridentsky.net/)
 - Issues: [GitHub Issues](https://github.com/TridentSky/mta-fastdl-docker/issues)
 
 ## License
@@ -103,7 +103,7 @@ This project is open source. Multi Theft Auto: San Andreas is developed by the M
 
 - **MTA:SA** - [Multi Theft Auto Team](https://multitheftauto.com)
 - **Pterodactyl** - [Pterodactyl Panel](https://pterodactyl.io)
-- **Powered by** - [Trident Sky](https://www.tridentsky.net)
+- **Powered by** - [Trident Sky](https://tridentsky.net/)
 
 ---
 
