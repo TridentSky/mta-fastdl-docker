@@ -78,12 +78,19 @@ echo ""
 echo "[MTA] Configuring mtaserver.conf..."
 
 if [ "${FASTDL_ENABLED}" = "1" ]; then
-    if grep -q "<httpdownloadurl>" mods/deathmatch/mtaserver.conf 2>/dev/null; then
-        sed -i "s|<httpdownloadurl>.*</httpdownloadurl>|<httpdownloadurl>http://${P_SERVER_IP}:${FASTDL_PORT}/</httpdownloadurl>|g" mods/deathmatch/mtaserver.conf
-    else
-        sed -i "s|</config>|    <httpdownloadurl>http://${P_SERVER_IP}:${FASTDL_PORT}/</httpdownloadurl>\n</config>|g" mods/deathmatch/mtaserver.conf
+    SERVER_IP=$(hostname -I | awk '{print $1}')
+    if [ -z "$SERVER_IP" ]; then
+        SERVER_IP=$(curl -s ifconfig.me 2>/dev/null || echo "127.0.0.1")
     fi
-    echo "[MTA] FastDL URL configured: http://${P_SERVER_IP}:${FASTDL_PORT}/"
+
+    FASTDL_URL="http://${SERVER_IP}:${FASTDL_PORT}/"
+
+    if grep -q "<httpdownloadurl>" mods/deathmatch/mtaserver.conf 2>/dev/null; then
+        sed -i "s|<httpdownloadurl>.*</httpdownloadurl>|<httpdownloadurl>${FASTDL_URL}</httpdownloadurl>|g" mods/deathmatch/mtaserver.conf
+    else
+        sed -i "s|</config>|    <httpdownloadurl>${FASTDL_URL}</httpdownloadurl>\n</config>|g" mods/deathmatch/mtaserver.conf
+    fi
+    echo "[MTA] FastDL URL configured: ${FASTDL_URL}"
 else
     if grep -q "<httpdownloadurl>" mods/deathmatch/mtaserver.conf 2>/dev/null; then
         sed -i "/<httpdownloadurl>/d" mods/deathmatch/mtaserver.conf
