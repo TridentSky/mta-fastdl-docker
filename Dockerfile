@@ -12,12 +12,13 @@ RUN apt-get update && \
     libncurses5 \
     libncursesw5 \
     wget \
-    ca-certificates && \
+    ca-certificates \
+    libmysqlclient20 && \
     wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
     dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb || apt-get install -f -y && \
     rm -f libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
-    wget https://multitheftauto.com/dl/modules/64/libmysqlclient.so.16 -O /usr/lib/libmysqlclient.so.16 && \
-    chmod 755 /usr/lib/libmysqlclient.so.16 && \
+    ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so.20 /usr/lib/libmysqlclient.so.16 && \
+    ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so.20 /usr/lib/x86_64-linux-gnu/libmysqlclient.so.16 && \
     ldconfig && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
