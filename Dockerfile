@@ -15,15 +15,16 @@ RUN apt-get update && \
     ca-certificates \
     unzip \
     tar \
-    libssl3 && \
-    wget http://mirrors.kernel.org/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.23_amd64.deb && \
-    dpkg -i libssl1.1_1.1.1f-1ubuntu2.23_amd64.deb || true && \
-    rm -f libssl1.1_1.1.1f-1ubuntu2.23_amd64.deb && \
-    wget http://mirrors.kernel.org/ubuntu/pool/universe/m/mysql-5.7/libmysqlclient20_5.7.44-0ubuntu0.18.04.1_amd64.deb && \
-    dpkg -i libmysqlclient20_5.7.44-0ubuntu0.18.04.1_amd64.deb || apt-get install -f -y && \
-    rm -f libmysqlclient20_5.7.44-0ubuntu0.18.04.1_amd64.deb && \
-    ln -sf /usr/lib/x86_64-linux-gnu/libmysqlclient.so.20 /usr/lib/libmysqlclient.so.16 && \
-    ln -sf /usr/lib/x86_64-linux-gnu/libmysqlclient.so.20 /usr/lib/x86_64-linux-gnu/libmysqlclient.so.16 && \
+    curl && \
+    curl -L -o /tmp/libssl.deb http://mirrors.kernel.org/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.23_amd64.deb && \
+    dpkg -i /tmp/libssl.deb || true && \
+    rm -f /tmp/libssl.deb && \
+    curl -L -o /tmp/mysql.deb http://mirrors.kernel.org/ubuntu/pool/universe/m/mysql-5.7/libmysqlclient20_5.7.44-0ubuntu0.18.04.1_amd64.deb && \
+    dpkg -i /tmp/mysql.deb || apt-get install -f -y && \
+    rm -f /tmp/mysql.deb && \
+    find /usr/lib -name "libmysqlclient.so*" -type f -exec cp {} /usr/lib/libmysqlclient.so.16 \; && \
+    chmod 755 /usr/lib/libmysqlclient.so.16 && \
+    ldconfig && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
