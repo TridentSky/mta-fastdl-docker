@@ -5,6 +5,17 @@ echo "MySQL Ready | FastDL Ready"
 echo "https://tridentsky.net/"
 echo "=========================================="
 
+echo "[MySQL] Checking MySQL module..."
+if [ ! -f "x64/modules/mta_mysql.so" ]; then
+    echo "[MySQL] Installing MySQL module..."
+    mkdir -p x64/modules
+    wget -q https://github.com/mabako/mta-mysql/releases/download/v0.3.1/mta_mysql-linux-x64.so -O x64/modules/mta_mysql.so
+    chmod +x x64/modules/mta_mysql.so
+    echo "[MySQL] ✓ Module installed"
+else
+    echo "[MySQL] ✓ Module already installed"
+fi
+
 if [ "${FASTDL_ENABLED}" = "1" ]; then
     echo "[FastDL] Initializing on port ${FASTDL_PORT}..."
 
