@@ -1,4 +1,4 @@
-FROM ghcr.io/parkervcp/yolks:debian
+FROM ubuntu:20.04
 
 LABEL org.opencontainers.image.source=https://github.com/TridentSky/mta-fastdl-docker
 LABEL org.opencontainers.image.description="MTA:SA Server with FastDL and MySQL - Powered by Trident Sky"
@@ -14,12 +14,16 @@ RUN apt-get update && \
     wget \
     ca-certificates \
     unzip \
-    tar && \
+    tar \
+    iproute2 \
+    tzdata && \
     wget -O /usr/lib/libmysqlclient.so.16 https://nightly.mtasa.com/files/modules/64/libmysqlclient.so.16 && \
     chmod 755 /usr/lib/libmysqlclient.so.16 && \
     ldconfig && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m -d /home/container -s /bin/bash container
 
 COPY --chown=container:container entrypoint.sh /entrypoint.sh
 COPY --chown=container:container start.sh /opt/start.sh
