@@ -7,22 +7,15 @@ echo "www.tridentsky.net"
 echo "=========================================="
 
 if [ "${FASTDL_ENABLED}" = "1" ]; then
-    echo "[FastDL] Checking Nginx installation..."
-    if ! command -v nginx &> /dev/null; then
-        echo "[FastDL] Installing Nginx..."
-        apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq nginx-light > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-            echo "[FastDL] Nginx installed successfully"
-        else
-            echo "[FastDL] Failed to install Nginx - Skipping FastDL"
-            echo ""
-            echo "[MTA] Starting server on port ${SERVER_PORT}..."
-            ./mta-server64 --port ${SERVER_PORT} --httpport ${SERVER_WEBPORT} -n
-            exit 0
-        fi
-    fi
-
     echo "[FastDL] Initializing on port ${FASTDL_PORT}..."
+
+    if ! command -v nginx &> /dev/null; then
+        echo "[FastDL] Warning: Nginx not found, FastDL disabled"
+        FASTDL_ENABLED=0
+    fi
+fi
+
+if [ "${FASTDL_ENABLED}" = "1" ]; then
 
     mkdir -p /tmp/nginx_cache/{client_body,proxy,fastcgi,uwsgi,scgi}
 
