@@ -11,7 +11,10 @@ RUN apt-get update && \
     nginx \
     libncurses5 \
     libncursesw5 \
-    libssl1.1 && \
+    wget && \
+    wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.1_1.1.1w-0+deb11u1_amd64.deb && \
+    dpkg -i libssl1.1_1.1.1w-0+deb11u1_amd64.deb && \
+    rm libssl1.1_1.1.1w-0+deb11u1_amd64.deb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
