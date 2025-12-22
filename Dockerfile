@@ -16,10 +16,9 @@ RUN apt-get update && \
     wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
     dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb || apt-get install -f -y && \
     rm -f libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
-    wget http://ftp.us.debian.org/debian/pool/main/m/mysql-5.5/libmysqlclient18_5.5.62-0+deb8u1_amd64.deb && \
-    dpkg -i libmysqlclient18_5.5.62-0+deb8u1_amd64.deb || apt-get install -f -y && \
-    rm -f libmysqlclient18_5.5.62-0+deb8u1_amd64.deb && \
-    ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so.18 /usr/lib/libmysqlclient.so.16 && \
+    wget https://multitheftauto.com/dl/modules/64/libmysqlclient.so.16 -O /usr/lib/libmysqlclient.so.16 && \
+    chmod 755 /usr/lib/libmysqlclient.so.16 && \
+    ldconfig && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
