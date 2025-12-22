@@ -20,7 +20,8 @@ Professional Docker image for Multi Theft Auto: San Andreas servers with integra
 3. Allocate ports for:
    - Main server port (default: 22003)
    - HTTP port (default: 22005)
-   - FastDL port (default: 22015) - if using FastDL
+   - ASE query port (default: 22126) - automatically set to Main port + 123
+   - FastDL port (default: 22015) - optional, only if using FastDL
 4. Set `FASTDL_ENABLED=1` to enable FastDL
 5. Start your server
 
@@ -29,6 +30,19 @@ Professional Docker image for Multi Theft Auto: San Andreas servers with integra
 ```
 ghcr.io/tridentsky/mta-fastdl:latest
 ```
+
+## Port Configuration
+
+MTA:SA requires multiple ports to function correctly:
+
+| Port | Default | Description | Auto-configured |
+|------|---------|-------------|-----------------|
+| **Main Port** | 22003 | Primary server port for game connections | Set by Pterodactyl |
+| **HTTP Port** | 22005 | Web resources and admin panel | Yes |
+| **ASE Port** | 22126 | Query port for server list (Main + 123) | Automatic |
+| **FastDL Port** | 22015 | Optional Nginx FastDL port | Yes (if enabled) |
+
+**Important:** The ASE port is automatically calculated as Main Port + 123 and must be allocated in Pterodactyl for the server to appear in the public server list.
 
 ## Configuration Variables
 
