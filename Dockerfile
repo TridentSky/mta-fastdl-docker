@@ -14,15 +14,8 @@ RUN apt-get update && \
     wget \
     ca-certificates \
     unzip \
-    tar \
-    curl && \
-    curl -L -o /tmp/libssl.deb http://mirrors.kernel.org/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.23_amd64.deb && \
-    dpkg -i /tmp/libssl.deb || true && \
-    rm -f /tmp/libssl.deb && \
-    curl -L -o /tmp/mysql.deb http://mirrors.kernel.org/ubuntu/pool/universe/m/mysql-5.7/libmysqlclient20_5.7.44-0ubuntu0.18.04.1_amd64.deb && \
-    dpkg -i /tmp/mysql.deb || apt-get install -f -y && \
-    rm -f /tmp/mysql.deb && \
-    find /usr/lib -name "libmysqlclient.so*" -type f -exec cp {} /usr/lib/libmysqlclient.so.16 \; && \
+    tar && \
+    wget -O /usr/lib/libmysqlclient.so.16 https://nightly.mtasa.com/files/modules/64/libmysqlclient.so.16 && \
     chmod 755 /usr/lib/libmysqlclient.so.16 && \
     ldconfig && \
     apt-get clean && \
