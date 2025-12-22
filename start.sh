@@ -76,4 +76,4 @@ fi
 
 echo ""
 echo "[MTA] Starting server on port ${SERVER_PORT}..."
-./mta-server64 --port ${SERVER_PORT} --httpport ${SERVER_WEBPORT} -n
+exec ./mta-server64 --port ${SERVER_PORT} --httpport ${SERVER_WEBPORT} -n
