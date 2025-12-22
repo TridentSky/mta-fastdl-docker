@@ -1,5 +1,4 @@
 #!/bin/bash
-clear
 echo "=========================================="
 echo "MTA:SA Server - Trident Sky Edition"
 echo "MySQL Ready | FastDL Ready"
