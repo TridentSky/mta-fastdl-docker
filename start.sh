@@ -78,11 +78,6 @@ echo ""
 echo "[MTA] Configuring mtaserver.conf..."
 
 if [ "${FASTDL_ENABLED}" = "1" ]; then
-    SERVER_IP=$(hostname -I | awk '{print $1}')
-    if [ -z "$SERVER_IP" ]; then
-        SERVER_IP=$(curl -s ifconfig.me 2>/dev/null || echo "127.0.0.1")
-    fi
-
     FASTDL_URL="http://${SERVER_IP}:${FASTDL_PORT}/"
 
     if grep -q "<httpdownloadurl>" mods/deathmatch/mtaserver.conf 2>/dev/null; then
