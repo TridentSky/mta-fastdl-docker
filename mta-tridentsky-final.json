@@ -29,7 +29,7 @@
     },
     "variables": [
         {
-            "name": "Server Port",
+            "name": "SERVER_PORT",
             "description": "MTA server port",
             "env_variable": "SERVER_PORT",
             "default_value": "22003",

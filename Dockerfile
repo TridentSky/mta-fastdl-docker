@@ -14,8 +14,11 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+COPY --chown=container:container entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 USER container
 ENV USER=container HOME=/home/container
 WORKDIR /home/container
 
-CMD ["/bin/bash"]
+ENTRYPOINT ["/entrypoint.sh"]
