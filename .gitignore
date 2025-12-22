@@ -1,0 +1,18 @@
+# Claude Code
+.claude/
+
+# Testing files
+mta-tridentsky-simple.json
+mta-tridentsky.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+*.tmp
+*.bak
