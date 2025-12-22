@@ -19,9 +19,9 @@ RUN apt-get update && \
     tzdata && \
     wget -O /usr/lib/libmysqlclient.so.16 https://nightly.mtasa.com/files/modules/64/libmysqlclient.so.16 && \
     chmod 755 /usr/lib/libmysqlclient.so.16 && \
-    wget http://mirrors.kernel.org/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.23_amd64.deb && \
-    dpkg -i libssl1.1_1.1.1f-1ubuntu2.23_amd64.deb && \
-    rm -f libssl1.1_1.1.1f-1ubuntu2.23_amd64.deb && \
+    wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
+    dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb || apt-get install -f -y && \
+    rm -f libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
     ldconfig && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
