@@ -6,14 +6,20 @@ echo "https://tridentsky.net/"
 echo "=========================================="
 
 echo "[MySQL] Checking MySQL module..."
-if [ ! -f "x64/modules/mta_mysql.so" ]; then
+if [ ! -f "x64/modules/mta_mysql.so" ] || [ ! -s "x64/modules/mta_mysql.so" ]; then
     echo "[MySQL] Installing MySQL module..."
     mkdir -p x64/modules
-    wget -q https://github.com/mabako/mta-mysql/releases/download/v0.3.1/mta_mysql-linux-x64.so -O x64/modules/mta_mysql.so
-    chmod +x x64/modules/mta_mysql.so
-    echo "[MySQL] ✓ Module installed"
+    rm -f x64/modules/mta_mysql.so
+    wget --timeout=10 --tries=3 -O x64/modules/mta_mysql.so https://github.com/mabako/mta-mysql/releases/download/v0.3.1/mta_mysql-linux-x64.so 2>&1 | grep -v "Resolving\|Connecting\|HTTP"
+    if [ -s "x64/modules/mta_mysql.so" ]; then
+        chmod 755 x64/modules/mta_mysql.so
+        echo "[MySQL] ✓ Module installed successfully"
+    else
+        echo "[MySQL] ✗ Failed to download module"
+        rm -f x64/modules/mta_mysql.so
+    fi
 else
-    echo "[MySQL] ✓ Module already installed"
+    echo "[MySQL] ✓ Module already present"
 fi
 
 if [ "${FASTDL_ENABLED}" = "1" ]; then
