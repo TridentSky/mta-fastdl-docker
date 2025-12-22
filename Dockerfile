@@ -12,13 +12,16 @@ RUN apt-get update && \
     libncurses5 \
     libncursesw5 \
     wget \
-    ca-certificates \
-    libmariadb3 && \
+    ca-certificates && \
     wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
     dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb || apt-get install -f -y && \
     rm -f libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
-    find /usr/lib -name "libmysqlclient*.so*" -o -name "libmariadb*.so*" | head -1 | xargs -I {} ln -sf {} /usr/lib/libmysqlclient.so.16 && \
-    find /usr/lib -name "libmysqlclient*.so*" -o -name "libmariadb*.so*" | head -1 | xargs -I {} ln -sf {} /usr/lib/x86_64-linux-gnu/libmysqlclient.so.16 && \
+    wget http://snapshot.debian.org/archive/debian/20160531T223744Z/pool/main/m/mysql-5.6/libmysqlclient18_5.6.30-1_amd64.deb && \
+    dpkg -i libmysqlclient18_5.6.30-1_amd64.deb || true && \
+    rm -f libmysqlclient18_5.6.30-1_amd64.deb && \
+    cp /usr/lib/x86_64-linux-gnu/libmysqlclient.so.18.* /usr/lib/libmysqlclient.so.16 2>/dev/null || \
+    ln -sf /usr/lib/x86_64-linux-gnu/libmysqlclient.so.18 /usr/lib/libmysqlclient.so.16 && \
+    chmod 755 /usr/lib/libmysqlclient.so.16 && \
     ldconfig && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
