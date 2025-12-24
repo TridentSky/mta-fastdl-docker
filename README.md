@@ -37,12 +37,12 @@ ghcr.io/tridentsky/mta-fastdl:latest
 
 MTA:SA requires multiple ports to function correctly:
 
-| Port | Default | Description | Auto-configured |
-|------|---------|-------------|-----------------|
-| **Main Port** | 22003 | Primary server port for game connections | Set by Pterodactyl |
-| **HTTP Port** | 22005 | Web resources and admin panel | Yes |
-| **ASE Port** | 22126 | Query port for server list (Main + 123) | Automatic |
-| **FastDL Port** | 22015 | Optional Nginx FastDL port | Yes (if enabled) |
+| Port | Default | Protocol | Description | Auto-configured |
+|------|---------|----------|-------------|-----------------|
+| **Main Port** | 22003 | UDP | Primary server port for game connections | Set by Pterodactyl |
+| **HTTP Port** | 22005 | TCP | Web resources and admin panel | Yes |
+| **ASE Port** | 22126 | UDP | Query port for server list (Main + 123) | Automatic |
+| **FastDL Port** | 22015 | TCP | Optional Nginx FastDL port | Yes (if enabled) |
 
 **Important:** The ASE port is automatically calculated as Main Port + 123 and must be allocated in Pterodactyl for the server to appear in the public server list.
 
@@ -144,6 +144,7 @@ This project is open source. Multi Theft Auto: San Andreas is developed by the M
 
 - **MTA:SA** - [Multi Theft Auto Team](https://multitheftauto.com)
 - **Pterodactyl** - [Pterodactyl Panel](https://pterodactyl.io)
+- **Development** - Built with [Claude Code](https://claude.com/claude-code) by Anthropic
 - **Powered by** - [Trident Sky](https://tridentsky.net/)
 
 ---
