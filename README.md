@@ -7,7 +7,7 @@ Professional Docker image for Multi Theft Auto: San Andreas servers with integra
 - ✅ **Complete MySQL Support** - Works with all MySQL modules (`mta_mysql.so`, `dbconmy.so`, `dbConnect`)
 - ✅ **Automated FastDL** - Nginx-powered resource acceleration with auto-configuration
 - ✅ **Auto-Install MySQL Module** - Automatically downloads and installs `mta_mysql.so`
-- ✅ **Latest MTA Version** - Automatically downloads latest stable release from GitHub
+- ✅ **Latest MTA Version** - Automatically downloads the latest stable release from the official MTA mirror
 - ✅ **Ubuntu 22.04 LTS** - Modern, optimized, and secure base image
 - ✅ **Clean Console Output** - Professional, error-free startup messages
 - ✅ **Security Hardened** - Read-only system files, protected configuration
@@ -93,19 +93,23 @@ This image provides **complete MySQL/MariaDB support** out of the box:
 - Clean console output (no unnecessary warnings)
 - Access logs disabled for better performance
 - Gzip compression for FastDL transfers
-- Auto-download latest MTA:SA version with fallback
+- Open file cache for fast repeated downloads under player rush
+- `sendfile` + `tcp_nopush` + `tcp_nodelay` for maximum static throughput
 
 ### Security
 - System scripts are read-only (protected via `file_denylist`)
 - No arbitrary bash execution allowed
 - Minimal container footprint
 - Non-root user execution
+- Nginx hardened against DoS: per-IP connection limit, strict client timeouts (anti-slowloris), single-range requests only
+- Only GET/HEAD methods allowed on FastDL, hidden files blocked, no version disclosure (`server_tokens off`)
+- Patched OpenSSL 1.1 (final focal security release)
 
 ### Auto-Updates
-- Installation script fetches latest MTA:SA release from GitHub API
-- Falls back to stable version if API fails
+- Installation script fetches the latest stable MTA:SA build from `linux.multitheftauto.com` (GitHub releases no longer ship Linux tarballs)
 - Includes latest default resources and baseconfig
 - MySQL module auto-downloads from official MTA repository
+- Every image build is also tagged `sha-<commit>` on GHCR for instant rollback
 
 ## Building from Source
 
@@ -152,6 +156,10 @@ This project is open source. Multi Theft Auto: San Andreas is developed by the M
 ## Changelog
 
 ### Latest Version
+- **Hardened Nginx FastDL**: per-IP connection limits, strict timeouts, GET/HEAD only, hidden files blocked, open file cache
+- **Patched OpenSSL 1.1** (1.1.1f-1ubuntu2.24, final focal security release) with fallback
+- **Install script updated** for MTA v1.6+ (official mirror instead of removed GitHub Linux assets)
+- **Rollback tags**: every build published as `sha-<commit>` alongside `latest`
 - **Ubuntu 22.04 LTS** base for better performance and compatibility
 - **Auto-install MySQL module** (`mta_mysql.so`) on first startup
 - **Complete MySQL support** (all modules: `mta_mysql.so`, `dbconmy.so`, `dbConnect`)

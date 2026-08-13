@@ -28,4 +28,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/tridentsky/mta-fastdl:latest
+          tags: |
+            ghcr.io/tridentsky/mta-fastdl:latest
+            ghcr.io/tridentsky/mta-fastdl:sha-${{ github.sha }}

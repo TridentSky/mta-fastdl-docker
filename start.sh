@@ -10,7 +10,7 @@ if [ ! -f "x64/modules/mta_mysql.so" ] || [ ! -s "x64/modules/mta_mysql.so" ]; t
     echo "[MySQL] Installing MySQL module..."
     mkdir -p x64/modules
     rm -f x64/modules/mta_mysql.so
-    wget --timeout=10 --tries=3 -O x64/modules/mta_mysql.so https://nightly.mtasa.com/files/modules/64/mta_mysql.so 2>&1 | grep -v "Resolving\|Connecting\|HTTP"
+    wget --timeout=10 --tries=3 -q -O x64/modules/mta_mysql.so https://nightly.mtasa.com/files/modules/64/mta_mysql.so
     if [ -s "x64/modules/mta_mysql.so" ]; then
         chmod 755 x64/modules/mta_mysql.so
         echo "[MySQL] ✓ Module installed successfully"
@@ -51,9 +51,22 @@ http {
     uwsgi_temp_path /tmp/nginx_cache/uwsgi;
     scgi_temp_path /tmp/nginx_cache/scgi;
     access_log off;
+    server_tokens off;
     sendfile on;
     tcp_nopush on;
+    tcp_nodelay on;
     keepalive_timeout 30;
+    client_header_timeout 15s;
+    client_body_timeout 15s;
+    send_timeout 30s;
+    reset_timedout_connection on;
+    client_max_body_size 1m;
+    max_ranges 1;
+    limit_conn_zone $binary_remote_addr zone=perip:10m;
+    open_file_cache max=2000 inactive=60s;
+    open_file_cache_valid 60s;
+    open_file_cache_min_uses 1;
+    open_file_cache_errors off;
     gzip on;
     gzip_types application/octet-stream text/xml;
     server {
@@ -65,8 +78,15 @@ EOF
         root /home/container/mods/deathmatch/resource-cache/http-client-files;
         access_log off;
         error_log /tmp/nginx_server_error.log error;
+        limit_conn perip 30;
+        location ~ /\. {
+            deny all;
+        }
         location / {
             autoindex off;
+            limit_except GET {
+                deny all;
+            }
         }
     }
 }
