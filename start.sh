@@ -37,10 +37,12 @@ if [ "${FASTDL_ENABLED}" = "1" ]; then
 
     cat > /tmp/nginx.conf << 'EOF'
 worker_processes auto;
+worker_rlimit_nofile 16384;
 error_log /tmp/nginx_error.log error;
 pid /tmp/nginx.pid;
 events {
-    worker_connections 1024;
+    worker_connections 4096;
+    multi_accept on;
 }
 http {
     include /etc/nginx/mime.types;
@@ -63,7 +65,8 @@ http {
     client_max_body_size 1m;
     max_ranges 1;
     limit_conn_zone $binary_remote_addr zone=perip:10m;
-    open_file_cache max=2000 inactive=60s;
+    sendfile_max_chunk 512k;
+    open_file_cache max=10000 inactive=60s;
     open_file_cache_valid 60s;
     open_file_cache_min_uses 1;
     open_file_cache_errors off;
@@ -78,7 +81,7 @@ EOF
         root /home/container/mods/deathmatch/resource-cache/http-client-files;
         access_log off;
         error_log /tmp/nginx_server_error.log error;
-        limit_conn perip 30;
+        limit_conn perip 100;
         location ~ /\. {
             deny all;
         }
