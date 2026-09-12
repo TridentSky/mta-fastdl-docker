@@ -23,7 +23,7 @@ Professional Docker image for Multi Theft Auto: San Andreas servers with integra
    - Main server port (default: 22003)
    - HTTP port (default: 22005)
    - ASE query port (Main port + 123, e.g., 22126)
-   - FastDL port (default: 22015) - optional, only if using FastDL
+   - FastDL port (default: 22014) - optional, only if using FastDL
 4. Set `FASTDL_ENABLED=1` to enable FastDL (optional)
 5. Start your server - MySQL module installs automatically!
 
@@ -42,7 +42,7 @@ MTA:SA requires multiple ports to function correctly:
 | **Main Port** | 22003 | UDP | Primary server port for game connections | Set by Pterodactyl |
 | **HTTP Port** | 22005 | TCP | Web resources and admin panel | Yes |
 | **ASE Port** | 22126 | UDP | Query port for server list (Main + 123) | Automatic |
-| **FastDL Port** | 22015 | TCP | Optional Nginx FastDL port | Yes (if enabled) |
+| **FastDL Port** | 22014 | TCP | Optional Nginx FastDL port | Yes (if enabled) |
 
 **Important:** The ASE port is automatically calculated as Main Port + 123 and must be allocated in Pterodactyl for the server to appear in the public server list.
 
@@ -50,9 +50,43 @@ MTA:SA requires multiple ports to function correctly:
 
 | Variable | Description | Default | Editable |
 |----------|-------------|---------|----------|
-| `FASTDL_ENABLED` | Enable/Disable FastDL (0=Off, 1=On) | `0` | Yes |
-| `FASTDL_PORT` | Nginx port for FastDL service | `22015` | No |
+| `FASTDL_ENABLED` | Enable/Disable FastDL (0=Off, 1=On) | `1` | Yes |
+| `FASTDL_PORT` | Nginx port for FastDL service | `22014` | No |
 | `SERVER_WEBPORT` | HTTP port for resources and admin panel | `22005` | No |
+
+## Which MTA build you get, and how to change it
+
+MTA's **stable** channel publishes rarely. Measured on 2026-09-12, the file it serves
+(`linux.multitheftauto.com/dl/multitheftauto_linux_x64.tar.gz`) was built on **27 July 2025**, while
+the nightly channel was already on `1.6.0-rc-24147`. That is why a fresh install could feel like it
+shipped old files — and there was no way to ask for anything newer, nor to know afterwards what you
+had installed.
+
+Two variables now control it:
+
+| Variable | Default | What it does |
+|---|---|---|
+| `MTA_CHANNEL` | `stable` | `stable` (multitheftauto.com) or `nightly` (latest `1.6.0-rc`) |
+| `MTA_BUILD` | *(empty)* | Pin an exact build, e.g. `1.6.0-rc-24147`, for reproducible installs |
+
+The default stays `stable`: a customer buying hosting should not receive a release candidate unless
+they ask for one. The **`1.7.0-untested`** line is never selected automatically — you can only reach
+it by naming it in `MTA_BUILD`, and the installer warns when you do.
+
+Every install writes `VERSION-TRIDENTSKY.txt` at the server root with the channel, the exact source
+URL, the package name and the timestamp. Before, there was no way to tell which build a running
+server came from, which is precisely what made "my files are old" impossible to diagnose.
+
+### Downloads are verified now
+
+Each download is checked for size and archive integrity before anything is copied. A truncated file
+or an HTML error page used to install a broken server silently; now the install **aborts and says
+why**. Verified: an invalid `MTA_BUILD` stops with a clear message and leaves `/mnt/server` empty
+rather than half-populated.
+
+> **Note on `baseconfig.tar.gz`:** it is served from MTA's own mirror and was last updated in
+> **October 2022**. That is upstream's file, not ours — it only provides the starting `mtaserver.conf`
+> and ACL templates, which the panel overwrites with your allocated ports on first boot.
 
 ## MySQL Compatibility
 

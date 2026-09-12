@@ -10,13 +10,13 @@
     "description": "Multi Theft Auto San Andreas with FastDL and MySQL",
     "features": null,
     "docker_images": {
-        "ghcr.io\/tridentsky\/mta-fastdl:latest": "ghcr.io\/tridentsky\/mta-fastdl:latest"
+        "ghcr.io/tridentsky/mta-fastdl:latest": "ghcr.io/tridentsky/mta-fastdl:latest"
     },
     "file_denylist": [
-        "\/opt\/start.sh",
-        "\/entrypoint.sh"
+        "/opt/start.sh",
+        "/entrypoint.sh"
     ],
-    "startup": ".\/mta-server64",
+    "startup": "./mta-server64",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"Server started and is ready to accept connections\"\r\n}",
@@ -25,8 +25,8 @@
     },
     "scripts": {
         "installation": {
-            "script": "#!\/bin\/bash\r\ncd \/tmp\r\ncurl -fsSL -o mta.tar.gz https:\/\/linux.multitheftauto.com\/dl\/multitheftauto_linux_x64.tar.gz\r\ncurl -fsSL -o base.tar.gz https:\/\/linux.multitheftauto.com\/dl\/baseconfig.tar.gz\r\ncurl -fsSL -o res.zip https:\/\/mirror.multitheftauto.com\/mtasa\/resources\/mtasa-resources-latest.zip\r\nmkdir -p \/mnt\/server\r\ntar -xf mta.tar.gz\r\ncp -r multitheftauto_linux_x64\/* \/mnt\/server\/\r\nif [ ! -f \/mnt\/server\/x64\/libmysqlclient.so.16 ]; then\r\ncurl -fsSL -o \/mnt\/server\/x64\/libmysqlclient.so.16 https:\/\/nightly.mtasa.com\/files\/modules\/64\/libmysqlclient.so.16\r\nfi\r\nmkdir -p \/mnt\/server\/mods\/deathmatch\/resources\r\nunzip -qo res.zip -d \/mnt\/server\/mods\/deathmatch\/resources\r\ntar -xf base.tar.gz\r\ncp -r baseconfig\/* \/mnt\/server\/mods\/deathmatch\/\r\nmkdir -p \/mnt\/server\/mods\/deathmatch\/resource-cache\/http-client-files\r\nchown -R root:root \/mnt\r\nexport HOME=\/mnt\/server\r\necho \"===========================================\"\r\necho \"Installation completed - Trident Sky\"\r\necho \"Nginx + MySQL + FastDL Ready\"\r\necho \"===========================================\"",
-            "container": "ghcr.io\/parkervcp\/installers:ubuntu",
+            "script": "#!/bin/bash\n# Instalador de MTA:SA — Trident Sky\n#\n# POR QUE ESTE SCRIPT ES ASI:\n#\n# El canal estable de MTA publica pocas veces: a fecha de esta version servia un\n# build del 27/07/2025 mientras el canal nightly iba por 1.6.0-rc-24147. Quien\n# instalaba un servidor nuevo se encontraba binarios de trece meses atras sin\n# ninguna forma de pedir algo mas reciente, y sin saber siquiera que version\n# tenia. De ahi las tres cosas que hace este script y antes no:\n#\n#   1. CANAL ELEGIBLE   MTA_CHANNEL=stable|nightly\n#   2. VERSION FIJABLE  MTA_BUILD=1.6.0-rc-24147  (reproducible; vacio = la mas\n#                       reciente del canal)\n#   3. DESCARGA VERIFICADA  una descarga truncada instalaba un servidor roto en\n#                       silencio; ahora aborta y dice por que.\n#\n# El valor por defecto sigue siendo `stable`: un cliente que compra hosting no\n# debe recibir una release candidate sin pedirla.\nset -euo pipefail\n\nCANAL=\"${MTA_CHANNEL:-stable}\"\nBUILD=\"${MTA_BUILD:-}\"\nTMP=/tmp/mta-install\nmkdir -p \"$TMP\" /mnt/server\ncd \"$TMP\"\n\nlog(){ echo \"[instalador] $*\"; }\nmorir(){ echo \"[instalador] ERROR: $*\" >&2; exit 1; }\n\n# Descarga y comprueba que lo descargado es lo que dice ser. Un fichero de 0\n# bytes, una pagina de error HTML o un tar truncado producian antes una\n# instalacion rota que solo se notaba al arrancar.\nbajar(){  # $1 url  $2 destino  $3 tipo (tar|zip)  $4 minimo de bytes\n  local url=\"$1\" dst=\"$2\" tipo=\"$3\" min=\"$4\"\n  log \"descargando $(basename \"$dst\")\"\n  curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 20 --max-time 600 -o \"$dst\" \"$url\" \\\n    || morir \"no se pudo descargar $url\"\n  local n; n=$(stat -c%s \"$dst\" 2>/dev/null || echo 0)\n  [ \"$n\" -ge \"$min\" ] || morir \"$(basename \"$dst\") pesa $n bytes, menos de los $min esperados: descarga incompleta o URL equivocada\"\n  case \"$tipo\" in\n    tar) tar tzf \"$dst\" >/dev/null 2>&1 || morir \"$(basename \"$dst\") no es un tar.gz valido\" ;;\n    zip) unzip -tq \"$dst\"  >/dev/null 2>&1 || morir \"$(basename \"$dst\") no es un zip valido\" ;;\n  esac\n  log \"  ok, $(numfmt --to=iec \"$n\" 2>/dev/null || echo \"$n bytes\")\"\n}\n\n# --- servidor ---------------------------------------------------------------\nif [ \"$CANAL\" = \"nightly\" ]; then\n  # El canal nightly publica DOS lineas a la vez y solo una es apta para un\n  # servidor de cliente:\n  #   multitheftauto_linux_x64-1.6.0-rc-NNNNN   candidata a version, se usa esta\n  #   multitheftauto_linux_x64-1.7.0-untested-N  sin probar, NUNCA por defecto\n  # Y ojo con el nombre: la linea \"multitheftauto_linux-\" (sin _x64) es de 32\n  # bits y trae `mta-server`, no `mta-server64`.\n  if [ -n \"$BUILD\" ]; then\n    URL=\"https://nightly.mtasa.com/multitheftauto_linux_x64-${BUILD}.tar.gz\"\n    case \"$BUILD\" in\n      *untested*) log \"AVISO: has pedido una build 'untested'. No es apta para produccion.\" ;;\n    esac\n  else\n    ULT=$(curl -fsSL --max-time 60 https://nightly.mtasa.com/ 2>/dev/null \\\n          | grep -oE \"multitheftauto_linux_x64-[0-9.]+-rc-[0-9]+\\.tar\\.gz\" | sort -V | tail -1)\n    [ -n \"$ULT\" ] || morir \"no pude leer el indice del canal nightly; usa MTA_CHANNEL=stable o fija MTA_BUILD\"\n    URL=\"https://nightly.mtasa.com/${ULT}\"\n  fi\nelse\n  URL=\"https://linux.multitheftauto.com/dl/multitheftauto_linux_x64.tar.gz\"\nfi\nlog \"canal: $CANAL  ·  origen: $URL\"\nbajar \"$URL\" mta.tar.gz tar 5000000\n\nbajar \"https://linux.multitheftauto.com/dl/baseconfig.tar.gz\" base.tar.gz tar 4000\nbajar \"https://mirror.multitheftauto.com/mtasa/resources/mtasa-resources-latest.zip\" res.zip zip 1000000\n\n# --- instalar ---------------------------------------------------------------\ntar -xf mta.tar.gz\n# El directorio que sale del tar NO se llama igual en los dos canales: el estable\n# extrae \"multitheftauto_linux_x64/\" y el nightly \"multitheftauto_linux_x64-1.6.0-rc-24147/\".\n# Copiarlo por nombre fijo funcionaba solo con el estable.\nRAIZ=$(find . -maxdepth 1 -type d -name \"multitheftauto_linux*\" | head -1)\n[ -n \"$RAIZ\" ] || morir \"el tar no contenia ningun directorio multitheftauto_linux*\"\nlog \"paquete extraido en $(basename \"$RAIZ\")\"\ncp -r \"$RAIZ\"/* /mnt/server/\n[ -x /mnt/server/mta-server64 ] || morir \"el paquete no traia mta-server64 (¿descargaste la linea de 32 bits?)\"\n\nif [ ! -f /mnt/server/x64/libmysqlclient.so.16 ]; then\n  bajar \"https://nightly.mtasa.com/files/modules/64/libmysqlclient.so.16\" \\\n        /mnt/server/x64/libmysqlclient.so.16 \"\" 100000 || true\nfi\n\nmkdir -p /mnt/server/mods/deathmatch/resources\nunzip -qo res.zip -d /mnt/server/mods/deathmatch/resources\ntar -xf base.tar.gz\ncp -r baseconfig/* /mnt/server/mods/deathmatch/\nmkdir -p /mnt/server/mods/deathmatch/resource-cache/http-client-files\n\n# Deja constancia de QUE se instalo. Sin esto no habia forma de saber la version\n# de un servidor ya montado, que es justo lo que hacia dificil diagnosticar\n# \"tengo archivos viejos\".\n{\n  echo \"instalado:  $(date -u '+%Y-%m-%d %H:%M:%S UTC')\"\n  echo \"canal:      $CANAL\"\n  echo \"origen:     $URL\"\n  echo \"build:      ${BUILD:-<ultima del canal>}\"\n  echo \"paquete:    $(basename \"$RAIZ\")\"\n  echo \"servidor:   $(stat -c%y /mnt/server/mta-server64 2>/dev/null | cut -d. -f1)\"\n  echo \"recursos:   $(stat -c%s \"$TMP/res.zip\") bytes\"\n} > /mnt/server/VERSION-TRIDENTSKY.txt\n\nchown -R root:root /mnt\nexport HOME=/mnt/server\nlog \"instalacion completada\"\ncat /mnt/server/VERSION-TRIDENTSKY.txt | sed 's/^/[instalador] /'\n",
+            "container": "ghcr.io/parkervcp/installers:ubuntu",
             "entrypoint": "bash"
         }
     },
@@ -43,9 +43,9 @@
         },
         {
             "name": "FastDL Enabled",
-            "description": "Enable\/Disable FastDL system. When enabled (1), uses Nginx to accelerate resource downloads. Automatically configures httpdownloadurl in mtaserver.conf. Set to 0 to disable, 1 to enable.",
+            "description": "Enable/Disable FastDL system. When enabled (1), uses Nginx to accelerate resource downloads. Automatically configures httpdownloadurl in mtaserver.conf. Set to 0 to disable, 1 to enable.",
             "env_variable": "FASTDL_ENABLED",
-            "default_value": "0",
+            "default_value": "1",
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|numeric|in:0,1",
@@ -53,13 +53,31 @@
         },
         {
             "name": "FastDL Port",
-            "description": "Nginx port for FastDL service. Resources will be served from http:\/\/YOUR_IP:PORT\/ when FastDL is enabled. Must be allocated in server ports.",
+            "description": "Puerto del nginx de FastDL. Debe estar asignado en el panel: si el juego levanta nginx en un puerto que Docker no publica, nadie lo alcanza y la descarga rapida queda muerta sin avisar.",
             "env_variable": "FASTDL_PORT",
-            "default_value": "22015",
+            "default_value": "22014",
             "user_viewable": true,
             "user_editable": false,
             "rules": "required|numeric",
             "field_type": "text"
+        },
+        {
+            "name": "Canal de MTA",
+            "description": "De donde se descarga el servidor al instalar.\n\n  stable   (por defecto) el canal estable de multitheftauto.com. Publica pocas veces:\n           a fecha de hoy servia un build de julio de 2025.\n  nightly  la ultima candidata a version (linea 1.6.0-rc). Mas reciente, y es lo que\n           resuelve 'los archivos son viejos'. No se ofrece nunca la linea 'untested'.\n\nUn cliente que compra hosting recibe 'stable' salvo que pida otra cosa.",
+            "env_variable": "MTA_CHANNEL",
+            "default_value": "stable",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "required|string|in:stable,nightly"
+        },
+        {
+            "name": "Build fija de MTA",
+            "description": "Deja vacio para la mas reciente del canal. Pon una build concreta (por ejemplo 1.6.0-rc-24147) para que la instalacion sea reproducible y no cambie sola entre dos altas del mismo producto.",
+            "env_variable": "MTA_BUILD",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "nullable|string|max:64"
         }
     ]
 }
