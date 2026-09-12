@@ -43,9 +43,9 @@
         },
         {
             "name": "FastDL Enabled",
-            "description": "Enable/Disable FastDL system. When enabled (1), uses Nginx to accelerate resource downloads. Automatically configures httpdownloadurl in mtaserver.conf. Set to 0 to disable, 1 to enable.",
+            "description": "Activa el FastDL por nginx (0=no, 1=si).\n\nPor defecto 0 A PROPOSITO: con 1, una instalacion nueva levanta nginx en FASTDL_PORT aunque nadie haya asignado ese puerto en el panel. Docker no lo publica, nadie lo alcanza, y la descarga rapida queda muerta sin un solo mensaje de error.\n\nPonlo a 1 DESPUES de asignar el puerto. (En el panel de Trident Sky viene a 1 porque el aprovisionamiento reserva el puerto automaticamente; fuera de ahi hay que hacerlo a mano.)",
             "env_variable": "FASTDL_ENABLED",
-            "default_value": "1",
+            "default_value": "0",
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|numeric|in:0,1",

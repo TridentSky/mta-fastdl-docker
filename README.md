@@ -50,9 +50,13 @@ MTA:SA requires multiple ports to function correctly:
 
 | Variable | Description | Default | Editable |
 |----------|-------------|---------|----------|
-| `FASTDL_ENABLED` | Enable/Disable FastDL (0=Off, 1=On) | `1` | Yes |
+| `FASTDL_ENABLED` | Enable/Disable FastDL (0=Off, 1=On) | `0` | Yes |
 | `FASTDL_PORT` | Nginx port for FastDL service | `22014` | No |
 | `SERVER_WEBPORT` | HTTP port for resources and admin panel | `22005` | No |
+
+> **Enable FastDL only after allocating its port.** With `FASTDL_ENABLED=1` and no allocation for
+> `FASTDL_PORT`, nginx starts on a port Docker never publishes: nothing reaches it and the feature is
+> dead with no error message anywhere. That is why the default is `0`.
 
 ## Which MTA build you get, and how to change it
 
